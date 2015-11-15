@@ -5,18 +5,29 @@
     xmlns:local="using:App7"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    mc:Ignorable="d" Width="1125.075">
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Margin="0,0,-805,-14" >
+        <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="1125" Row="3">
 
-        <TextBox x:Name="textBox" HorizontalAlignment="Left" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Height="198" Width="350"/>
-        <Button x:Name="button" Content="Button" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,203,0,0" Click="button_Click"/>
-        <RichTextBlock x:Name="rtb1" Margin="10,240,28,0">
-            <Paragraph>
-                <Run Text="RichTextBlock"/>
-            </Paragraph>
-        </RichTextBlock>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="5*"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="7*" />
+            </Grid.RowDefinitions>
+            <TextBox x:Name="textBox" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="198" Width="1099" Grid.Row="0" Grid.Column="0"/>
+        <Button x:Name="button" Content="Button" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5" Click="button_Click" Grid.Row="1" Grid.Column="0"/>
 
+        <ScrollViewer Grid.Row="2">
+            <StackPanel>
+            <RichTextBlock OverflowContentTarget="{Binding ElementName=rtbo1}" x:Name="rtb1" Margin="5" Height="309" Width="1093">
+                <Paragraph>
+                    <Run Text="RichTextBlock"/>
+                </Paragraph>
+            </RichTextBlock>
+                <RichTextBlockOverflow x:Name="rtbo1" Margin="5" />
+            </StackPanel>
+        </ScrollViewer>
 
     </Grid>
+    
 </Page>

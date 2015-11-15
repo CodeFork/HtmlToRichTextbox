@@ -35,7 +35,8 @@ namespace App7
         private void button_Click(object sender, RoutedEventArgs e)
         {
             String text = textBox.Text;
-            List<Block> blocks = GenerateBlocksForHtml(text);
+            string baseUrl = "http://www.pja.edu.pl";
+            List<Block> blocks = GenerateBlocksForHtml(text, baseUrl);
 
             //Add the blocks to the RichTextBlock
             rtb1.Blocks.Clear();
@@ -48,21 +49,27 @@ namespace App7
         {
             List<Block> bc = new List<Block>();
 
-           // try
+            // try
             //{
-                HtmlDocument doc = new HtmlDocument();
-                doc.LoadHtml(xhtml);
+            HtmlDocument doc = new HtmlDocument();
+            doc.LoadHtml(xhtml);
 
-                foreach (HtmlNode img in doc.DocumentNode.Descendants("img"))
+            foreach (HtmlNode img in doc.DocumentNode.Descendants("img"))
+            {
+                if (!img.Attributes["src"].Value.StartsWith("http") && baselink != null)
                 {
-                    if (!img.Attributes["src"].Value.StartsWith("http") && baselink != null)
-                    {
-                        img.Attributes["src"].Value = baselink + img.Attributes["src"].Value;
-                    }
+                    img.Attributes["src"].Value = baselink + img.Attributes["src"].Value;
                 }
-
-                Block b = GenerateParagraph(doc.DocumentNode);
-                bc.Add(b);
+            }
+            foreach (HtmlNode link in doc.DocumentNode.Descendants("a"))
+            {
+                if (!link.Attributes["href"].Value.StartsWith("http") && baselink != null)
+                {
+                    link.Attributes["href"].Value = baselink + link.Attributes["href"].Value;
+                }
+            }
+            Block b = GenerateParagraph(doc.DocumentNode);
+            bc.Add(b);
             //}
             //catch (Exception ex)
             //{
@@ -125,64 +132,51 @@ namespace App7
 
         private static Inline GenerateBlockForNode(HtmlNode node)
         {
-            switch (node.Name)
+            switch (node.Name.ToLower())
             {
                 case "div":
                     return GenerateSpan(node);
                 case "p":
-                case "P":
                     return GenerateInnerParagraph(node);
                 case "img":
-                case "IMG":
                     return GenerateImage(node);
                 case "a":
-                case "A":
                     if (node.ChildNodes.Count >= 1 && (node.FirstChild.Name == "img" || node.FirstChild.Name == "IMG"))
                         return GenerateImage(node.FirstChild);
                     else
                         return GenerateHyperLink(node);
                 case "li":
-                case "LI":
                     return GenerateLI(node);
                 case "b":
-                case "B":
+                case "strong":
                     return GenerateBold(node);
                 case "i":
-                case "I":
                     return GenerateItalic(node);
                 case "u":
-                case "U":
                     return GenerateUnderline(node);
                 case "br":
-                case "BR":
                     return new LineBreak();
                 case "span":
-                case "Span":
                     return GenerateSpan(node);
                 case "iframe":
-                case "Iframe":
                     return GenerateIFrame(node);
                 case "#text":
                     if (!string.IsNullOrWhiteSpace(node.InnerText))
                         return new Run() { Text = CleanText(node.InnerText) };
                     break;
                 case "h1":
-                case "H1":
                     return GenerateH1(node);
                 case "h2":
-                case "H2":
                     return GenerateH2(node);
                 case "h3":
-                case "H3":
                     return GenerateH3(node);
                 case "ul":
-                case "UL":
                     return GenerateUL(node);
                 default:
-                    return GenerateSpanWNewLine(node);
-                    //if (!string.IsNullOrWhiteSpace(node.InnerText))
-                    //    return new Run() { Text = CleanText(node.InnerText) };
-                    //break;
+                    break; //return GenerateSpanWNewLine(node);
+                //if (!string.IsNullOrWhiteSpace(node.InnerText))
+                //    return new Run() { Text = CleanText(node.InnerText) };
+                //break;
             }
             return null;
         }
@@ -225,7 +219,7 @@ namespace App7
             }
             return s;
         }
-        
+
         static void img_ImageFailed(object sender, ExceptionRoutedEventArgs e)
         {
             var i = 5;
